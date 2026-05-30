@@ -130,8 +130,21 @@
               </div>
               <div class="form-stack">
                 <input type="text" id="hero_name" class="form-control" placeholder="Full Name *" aria-label="Full Name" required>
-                <input type="tel" id="hero_phone" class="form-control" placeholder="Mobile Number *" aria-label="Mobile Number"
-                  required>
+                <div style="display: flex; gap: 10px; width: 100%;">
+                  <input type="tel" id="hero_phone" class="form-control" placeholder="Mobile Number *" aria-label="Mobile Number"
+                    required style="flex: 1; min-width: 0;">
+                  <button type="button" id="btn_hero_send_otp" onclick="sendHeroOtp()" class="btn btn-purple"
+                    style="white-space: nowrap; padding: 12px 18px; font-weight: 700; border-radius: 8px; font-size: 13px;">Send OTP</button>
+                </div>
+                <div id="hero_otp_section" style="display: none; margin-top: 2px;">
+                  <div style="display: flex; gap: 10px; width: 100%;">
+                    <input class="form-control" id="hero_otp" type="text" placeholder="6-digit OTP *" maxlength="6"
+                      style="flex: 1; min-width: 0;">
+                    <button type="button" id="btn_hero_verify_otp" onclick="verifyHeroOtp()" class="btn btn-purple"
+                      style="white-space: nowrap; padding: 12px 18px; font-weight: 700; border-radius: 8px; font-size: 13px;">Verify OTP</button>
+                  </div>
+                  <div id="hero_otp_success_msg" style="display: none; color: #22C55E; font-size: 0.85rem; margin-top: 5px; font-weight: 600;">OTP Verified Successfully!</div>
+                </div>
                 <input type="email" id="hero_email" class="form-control" placeholder="Email Address *" aria-label="Email Address"
                   required>
                 <select id="hero_state" class="form-control" aria-label="State" required>
@@ -803,7 +816,7 @@
         <input type="text" class="form-control form-control--dark" placeholder="City *" aria-label="City" required>
         <div></div>
       </div>
-      <button class="final-submit btn-pulse"
+      <button class="final-submit btn-pulse open-popup"
         onclick="this.textContent='✅ Slot Confirmed!';this.style.background='#16A34A';this.style.animation='none'">✅
         CONFIRM MY FREE NFET SLOT</button>
       <div class="final-guarantees">
@@ -1105,7 +1118,7 @@
           </div>
         </div>
 
-        <div class="lf-row single">
+        <div class="lf-row single" style="display: none;">
           <div class="lf-field">
             <label class="lf-label" for="gcc_degree">Institution/University*</label>
             <div class="custom-select-container">
