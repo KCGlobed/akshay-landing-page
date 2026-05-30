@@ -831,6 +831,8 @@ function loadStateCityData() {
         .then(res => res.json())
         .then(data => {
             stateCityData = data;
+            
+            // Populate GCC State select
             const stateSelect = document.getElementById("gcc_state");
             if (stateSelect) {
                 while (stateSelect.options.length > 1) {
@@ -853,6 +855,30 @@ function loadStateCityData() {
                     updateCityDropdown(stateSelect.value);
                 }
             }
+
+            // Populate Hero State select
+            const heroStateSelect = document.getElementById("hero_state");
+            if (heroStateSelect) {
+                while (heroStateSelect.options.length > 1) {
+                    heroStateSelect.remove(1);
+                }
+
+                const states = Object.keys(data).sort();
+                states.forEach(state => {
+                    const option = document.createElement("option");
+                    option.value = state;
+                    option.textContent = state;
+                    heroStateSelect.appendChild(option);
+                });
+
+                heroStateSelect.addEventListener("change", function () {
+                    updateHeroCityDropdown(this.value);
+                });
+
+                if (heroStateSelect.value) {
+                    updateHeroCityDropdown(heroStateSelect.value);
+                }
+            }
         })
         .catch(err => console.error("Could not load state-city.json", err));
 }
@@ -862,6 +888,23 @@ function updateCityDropdown(selectedState) {
     if (!citySelect) return;
 
     citySelect.innerHTML = '<option value="">Select city</option>';
+
+    if (selectedState && stateCityData && stateCityData[selectedState]) {
+        const cities = stateCityData[selectedState].sort();
+        cities.forEach(city => {
+            const option = document.createElement("option");
+            option.value = city;
+            option.textContent = city;
+            citySelect.appendChild(option);
+        });
+    }
+}
+
+function updateHeroCityDropdown(selectedState) {
+    const citySelect = document.getElementById("hero_city");
+    if (!citySelect) return;
+
+    citySelect.innerHTML = '<option value="">City *</option>';
 
     if (selectedState && stateCityData && stateCityData[selectedState]) {
         const cities = stateCityData[selectedState].sort();
