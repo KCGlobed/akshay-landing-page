@@ -152,16 +152,16 @@ function handleHeroConfirm(e) {
         return;
     }
 
-    if (!isHeroOtpVerified) {
-        const el = document.getElementById("hero_phone");
-        if (el) {
-            el.style.borderColor = "#EF4444";
-            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
-            el.focus();
-        }
-        alert("Please verify your mobile number with OTP first.");
-        return;
-    }
+    // if (!isHeroOtpVerified) {
+    //     const el = document.getElementById("hero_phone");
+    //     if (el) {
+    //         el.style.borderColor = "#EF4444";
+    //         el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+    //         el.focus();
+    //     }
+    //     alert("Please verify your mobile number with OTP first.");
+    //     return;
+    // }
 
     showLoadingModal("Initializing secure checkout...");
     startPayment(heroName, heroEmail, heroPhone, heroCity, heroState, "N/A");
@@ -451,7 +451,7 @@ function handlePayClick() {
     // if (!degree) { setFieldError("gcc_degree", "University selection is required"); hasError = true; }
     if (!commerceChecked) { setFieldError("gcc_commerce_graduate", "This confirmation is required"); hasError = true; }
 
-    if (!isOtpVerified) { setFieldError("gcc_phone", "Please verify your mobile number with OTP"); hasError = true; }
+    // if (!isOtpVerified) { setFieldError("gcc_phone", "Please verify your mobile number with OTP"); hasError = true; }
 
     if (hasError) {
         const firstErr = document.querySelector(".field-error[style*='display: block']");

@@ -130,10 +130,10 @@
               </div>
               <div class="form-stack">
                 <input type="text" id="hero_name" class="form-control" placeholder="Full Name *" aria-label="Full Name" required>
-                <div style="display: flex; gap: 10px; width: 100%;">
+                <!-- <div style="display: flex; gap: 10px; width: 100%;"> -->
                   <input type="tel" id="hero_phone" class="form-control" placeholder="Mobile Number *" aria-label="Mobile Number"
-                    required style="flex: 1; min-width: 0;">
-                  <button type="button" id="btn_hero_send_otp" onclick="sendHeroOtp()" class="btn btn-purple"
+                    required>
+                  <!-- <button type="button" id="btn_hero_send_otp" onclick="sendHeroOtp()" class="btn btn-purple"
                     style="white-space: nowrap; padding: 12px 18px; font-weight: 700; border-radius: 8px; font-size: 13px;">Send OTP</button>
                 </div>
                 <div id="hero_otp_section" style="display: none; margin-top: 2px;">
@@ -144,7 +144,7 @@
                       style="white-space: nowrap; padding: 12px 18px; font-weight: 700; border-radius: 8px; font-size: 13px;">Verify OTP</button>
                   </div>
                   <div id="hero_otp_success_msg" style="display: none; color: #22C55E; font-size: 0.85rem; margin-top: 5px; font-weight: 600;">OTP Verified Successfully!</div>
-                </div>
+                </div> -->
                 <input type="email" id="hero_email" class="form-control" placeholder="Email Address *" aria-label="Email Address"
                   required>
                 <select id="hero_state" class="form-control" aria-label="State" required>
@@ -1036,7 +1036,7 @@
   </div>
 
   <!-- Registration Form Modal -->
-  <div class="form-modal-overlay" id="registrationModal">
+  <!-- <div class="form-modal-overlay" id="registrationModal">
     <div class="form-modal-content">
       <div class="modal-close" onclick="closeForm()">✕</div>
       <div class="lead-form">
@@ -1137,7 +1137,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Status Modal (Processing/Success/Failure) -->
   <div id="statusModalOverlay" class="status-overlay">
