@@ -523,8 +523,10 @@
       const params = new URLSearchParams(window.location.search);
       const orderId = params.get("cf_order_id");
       if (orderId) {
-        document.getElementById("paymentIdValue").textContent = orderId;
-        document.getElementById("paymentIdBox").style.display = "block";
+        const valEl = document.getElementById("paymentIdValue");
+        const boxEl = document.getElementById("paymentIdBox");
+        if (valEl) valEl.textContent = orderId;
+        if (boxEl) boxEl.style.display = "block";
       }
     });
   </script>
