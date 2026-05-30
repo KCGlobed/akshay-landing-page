@@ -114,7 +114,7 @@ async function handleHeroConfirm(e) {
                     city: heroCity,
                     state: heroState,
                     university: "N/A",
-                    source: 14
+                    source: 14 
                 })
             }
         );
@@ -154,19 +154,8 @@ async function handleHeroConfirm(e) {
             );
         }
 
-        // SUCCESS POPUP
-        showStatusModal(
-            true,
-            "Your NFET slot has been successfully confirmed. Our team will contact you shortly."
-        );
-
-        // CLEAR FORM
-        document.getElementById("hero_name").value = "";
-        document.getElementById("hero_phone").value = "";
-        document.getElementById("hero_email").value = "";
-        document.getElementById("hero_state").selectedIndex = 0;
-        document.getElementById("hero_city").innerHTML =
-            '<option value="">City *</option>';
+        // SUCCESS REDIRECT
+        window.location.href = "thank-you.html";
 
     } catch (error) {
         console.error(error);
