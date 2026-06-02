@@ -1,28 +1,20 @@
-// --- EXISTING LANDING PAGE ANIMATIONS & COUNTDOWN ---
-(function () {
-    if (localStorage.getItem("paymentSuccess") === "true") {
-        return;
-    }
-
-    var modal = document.getElementById('enroll-modal');
-    if (modal) {
-        setTimeout(function () { modal.style.display = 'flex'; }, 1600);
-        modal.addEventListener('click', function (e) {
-            if (e.target === modal) dismissModal();
-        });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') dismissModal();
-        });
-    }
+(function(){
+  var modal = document.getElementById('enroll-modal');
+  setTimeout(function(){ modal.style.display = 'flex'; document.body.classList.add('modal-open'); }, 1600);
+  modal.addEventListener('click', function(e){
+    if(e.target === modal) dismissModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') dismissModal();
+  });
 })();
 
-function dismissModal() {
-    var m = document.getElementById('enroll-modal');
-    if (m) {
-        m.style.transition = 'opacity .2s';
-        m.style.opacity = '0';
-        setTimeout(function () { m.style.display = 'none'; m.style.opacity = ''; m.style.transition = ''; }, 200);
-    }
+function dismissModal(){
+  document.body.classList.remove('modal-open');
+  var m = document.getElementById('enroll-modal');
+  m.style.transition = 'opacity .2s';
+  m.style.opacity = '0';
+  setTimeout(function(){ m.style.display = 'none'; m.style.opacity = ''; m.style.transition = ''; }, 200);
 }
 
 (function () {
@@ -86,14 +78,82 @@ async function handleHeroConfirm(e) {
     const heroCity = document.getElementById("hero_city")?.value.trim() || "";
 
     let hasError = false;
+    let firstErrEl = null;
 
-    if (!heroName) hasError = true;
-    if (!heroPhone || !/^[6-9]\d{9}$/.test(heroPhone)) hasError = true;
-    if (!heroEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(heroEmail)) hasError = true;
-    if (!heroState) hasError = true;
-    if (!heroCity) hasError = true;
+    // Reset styles
+    const fields = ["hero_name", "hero_phone", "hero_email", "hero_state", "hero_city"];
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.borderColor = "";
+            el.style.boxShadow = "";
+        }
+    });
 
-    if (hasError) return;
+    if (!heroName) {
+        const el = document.getElementById("hero_name");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        hasError = true;
+    }
+    if (!heroPhone || !/^[6-9]\d{9}$/.test(heroPhone)) {
+        const el = document.getElementById("hero_phone");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        hasError = true;
+    }
+    if (!heroEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(heroEmail)) {
+        const el = document.getElementById("hero_email");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        hasError = true;
+    }
+    if (!heroState) {
+        const el = document.getElementById("hero_state");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        hasError = true;
+    }
+    if (!heroCity) {
+        const el = document.getElementById("hero_city");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        hasError = true;
+    }
+
+    if (hasError) {
+        if (firstErrEl) {
+            firstErrEl.focus();
+            firstErrEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+    }
+
+    if (!isHeroOtpVerified) {
+        const phoneInput = document.getElementById("hero_phone");
+        if (phoneInput) {
+            phoneInput.style.borderColor = "#EF4444";
+            phoneInput.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            phoneInput.focus();
+        }
+        alert("Please verify your mobile number with OTP first.");
+        return;
+    }
 
     showLoadingModal("Please wait, creating your account...");
 
@@ -211,6 +271,445 @@ document.addEventListener("click", function (e) {
 var isHeroOtpVerified = false;
 var heroOtpTimerInterval = null;
 
+async function sendHeroOtp() {
+    const phoneInput = document.getElementById("hero_phone");
+    const phone = phoneInput ? phoneInput.value.trim() : "";
+    const btn = document.getElementById("btn_hero_send_otp");
+
+    if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
+        if (phoneInput) {
+            phoneInput.style.borderColor = "#EF4444";
+            phoneInput.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+        }
+        alert("Please enter a valid 10-digit mobile number to send OTP.");
+        return;
+    }
+
+    if (phoneInput) {
+        phoneInput.style.borderColor = "";
+        phoneInput.style.boxShadow = "";
+    }
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Sending...";
+    }
+
+    try {
+        const res = await fetch(OTP_BASE_URL + '/api/otp/send', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mobile: phone })
+        });
+        const data = await res.json();
+
+        if (data.success || res.ok) {
+            const otpSection = document.getElementById("hero_otp_section");
+            if (otpSection) otpSection.style.display = "block";
+
+            let otpCountdown = 60;
+            if (btn) btn.innerText = `Resend in ${otpCountdown}s`;
+
+            if (heroOtpTimerInterval) clearInterval(heroOtpTimerInterval);
+            heroOtpTimerInterval = setInterval(() => {
+                otpCountdown--;
+                if (otpCountdown > 0) {
+                    if (btn) btn.innerText = `Resend in ${otpCountdown}s`;
+                } else {
+                    clearInterval(heroOtpTimerInterval);
+                    if (btn) {
+                        btn.innerText = "Resend OTP";
+                        btn.disabled = false;
+                    }
+                }
+            }, 1000);
+
+        } else {
+            if (phoneInput) phoneInput.style.borderColor = "#EF4444";
+            alert(data.message || data.statusMessage || "Failed to send OTP");
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Send OTP";
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        if (phoneInput) phoneInput.style.borderColor = "#EF4444";
+        alert("Failed to send OTP. Please try again.");
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Send OTP";
+        }
+    }
+}
+
+async function verifyHeroOtp() {
+    const phone = document.getElementById("hero_phone")?.value.trim() || "";
+    const otpInput = document.getElementById("hero_otp");
+    const otp = otpInput ? otpInput.value.trim() : "";
+    const btn = document.getElementById("btn_hero_verify_otp");
+
+    if (!otp || otp.length !== 6) {
+        if (otpInput) otpInput.style.borderColor = "#EF4444";
+        alert("Please enter a valid 6-digit OTP.");
+        return;
+    }
+
+    if (otpInput) otpInput.style.borderColor = "";
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Verifying...";
+    }
+
+    try {
+        const res = await fetch(OTP_BASE_URL + '/api/otp/verify', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mobile: phone, otp: otp })
+        });
+        const data = await res.json();
+
+        if (data.success || res.ok) {
+            isHeroOtpVerified = true;
+            if (heroOtpTimerInterval) clearInterval(heroOtpTimerInterval);
+            const successMsg = document.getElementById("hero_otp_success_msg");
+            if (successMsg) successMsg.style.display = "block";
+            if (otpInput) otpInput.disabled = true;
+            
+            const phoneInput = document.getElementById("hero_phone");
+            if (phoneInput) phoneInput.disabled = true;
+
+            const sendBtn = document.getElementById("btn_hero_send_otp");
+            if (sendBtn) sendBtn.style.display = "none";
+            
+            if (btn) btn.innerText = "Verified";
+        } else {
+            if (otpInput) otpInput.style.borderColor = "#EF4444";
+            alert(data.message || data.statusMessage || "Invalid or expired OTP");
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Verify OTP";
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        if (otpInput) otpInput.style.borderColor = "#EF4444";
+        alert("Failed to verify OTP. Please try again.");
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Verify OTP";
+        }
+    }
+}
+
+// Bottom OTP send and verify pipeline
+var isBottomOtpVerified = false;
+var bottomOtpTimerInterval = null;
+
+async function sendBottomOtp() {
+    const phoneInput = document.getElementById("bottom_phone");
+    const phone = phoneInput ? phoneInput.value.trim() : "";
+    const btn = document.getElementById("btn_bottom_send_otp");
+
+    if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
+        if (phoneInput) {
+            phoneInput.style.borderColor = "#EF4444";
+            phoneInput.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+        }
+        alert("Please enter a valid 10-digit mobile number to send OTP.");
+        return;
+    }
+
+    if (phoneInput) {
+        phoneInput.style.borderColor = "";
+        phoneInput.style.boxShadow = "";
+    }
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Sending...";
+    }
+
+    try {
+        const res = await fetch(OTP_BASE_URL + '/api/otp/send', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mobile: phone })
+        });
+        const data = await res.json();
+
+        if (data.success || res.ok) {
+            const otpSection = document.getElementById("bottom_otp_section");
+            if (otpSection) otpSection.style.display = "block";
+
+            let otpCountdown = 60;
+            if (btn) btn.innerText = `Resend in ${otpCountdown}s`;
+
+            if (bottomOtpTimerInterval) clearInterval(bottomOtpTimerInterval);
+            bottomOtpTimerInterval = setInterval(() => {
+                otpCountdown--;
+                if (otpCountdown > 0) {
+                    if (btn) btn.innerText = `Resend in ${otpCountdown}s`;
+                } else {
+                    clearInterval(bottomOtpTimerInterval);
+                    if (btn) {
+                        btn.innerText = "Resend OTP";
+                        btn.disabled = false;
+                    }
+                }
+            }, 1000);
+
+        } else {
+            if (phoneInput) phoneInput.style.borderColor = "#EF4444";
+            alert(data.message || data.statusMessage || "Failed to send OTP");
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Send OTP";
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        if (phoneInput) phoneInput.style.borderColor = "#EF4444";
+        alert("Failed to send OTP. Please try again.");
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Send OTP";
+        }
+    }
+}
+
+async function verifyBottomOtp() {
+    const phone = document.getElementById("bottom_phone")?.value.trim() || "";
+    const otpInput = document.getElementById("bottom_otp");
+    const otp = otpInput ? otpInput.value.trim() : "";
+    const btn = document.getElementById("btn_bottom_verify_otp");
+
+    if (!otp || otp.length !== 6) {
+        if (otpInput) otpInput.style.borderColor = "#EF4444";
+        alert("Please enter a valid 6-digit OTP.");
+        return;
+    }
+
+    if (otpInput) otpInput.style.borderColor = "";
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Verifying...";
+    }
+
+    try {
+        const res = await fetch(OTP_BASE_URL + '/api/otp/verify', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mobile: phone, otp: otp })
+        });
+        const data = await res.json();
+
+        if (data.success || res.ok) {
+            isBottomOtpVerified = true;
+            if (bottomOtpTimerInterval) clearInterval(bottomOtpTimerInterval);
+            const successMsg = document.getElementById("bottom_otp_success_msg");
+            if (successMsg) successMsg.style.display = "block";
+            if (otpInput) otpInput.disabled = true;
+            
+            const phoneInput = document.getElementById("bottom_phone");
+            if (phoneInput) phoneInput.disabled = true;
+
+            const sendBtn = document.getElementById("btn_bottom_send_otp");
+            if (sendBtn) sendBtn.style.display = "none";
+            
+            if (btn) btn.innerText = "Verified";
+        } else {
+            if (otpInput) otpInput.style.borderColor = "#EF4444";
+            alert(data.message || data.statusMessage || "Invalid or expired OTP");
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Verify OTP";
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        if (otpInput) otpInput.style.borderColor = "#EF4444";
+        alert("Failed to verify OTP. Please try again.");
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Verify OTP";
+        }
+    }
+}
+
+async function handleBottomConfirm(e) {
+    if (e) e.preventDefault();
+
+    const bottomName = document.getElementById("bottom_name")?.value.trim() || "";
+    const bottomPhone = document.getElementById("bottom_phone")?.value.trim() || "";
+    const bottomEmail = document.getElementById("bottom_email")?.value.trim() || "";
+    const bottomState = document.getElementById("bottom_state")?.value || "";
+    const bottomCity = document.getElementById("bottom_city")?.value.trim() || "";
+
+    let hasError = false;
+    let firstErrEl = null;
+
+    // Reset styles
+    const fields = ["bottom_name", "bottom_phone", "bottom_email", "bottom_state", "bottom_city"];
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.borderColor = "";
+            el.style.boxShadow = "";
+        }
+    });
+
+    if (!bottomName) {
+        const el = document.getElementById("bottom_name");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        hasError = true;
+    }
+    if (!bottomPhone || !/^[6-9]\d{9}$/.test(bottomPhone)) {
+        const el = document.getElementById("bottom_phone");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        hasError = true;
+    }
+    if (!bottomEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(bottomEmail)) {
+        const el = document.getElementById("bottom_email");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        hasError = true;
+    }
+    if (!bottomState) {
+        const el = document.getElementById("bottom_state");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        hasError = true;
+    }
+    if (!bottomCity) {
+        const el = document.getElementById("bottom_city");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        hasError = true;
+    }
+
+    if (hasError) {
+        if (firstErrEl) {
+            firstErrEl.focus();
+            firstErrEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+    }
+
+    if (!isBottomOtpVerified) {
+        const phoneInput = document.getElementById("bottom_phone");
+        if (phoneInput) {
+            phoneInput.style.borderColor = "#EF4444";
+            phoneInput.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            phoneInput.focus();
+        }
+        alert("Please verify your mobile number with OTP first.");
+        return;
+    }
+
+    showLoadingModal("Please wait, creating your account...");
+
+    try {
+
+        // STEP 1 : CREATE DOSSIER
+        const dossierRes = await fetch(
+            GCC_BACKEND_URL + "/api/career/createdossierform",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    full_name: bottomName,
+                    email: bottomEmail,
+                    phone: bottomPhone,
+                    city: bottomCity,
+                    state: bottomState,
+                    university: "N/A",
+                    source: 14 
+                })
+            }
+        );
+
+        const dossierData = await dossierRes.json();
+
+        if (!dossierData.success) {
+            throw new Error(
+                dossierData.message || "Failed to create dossier"
+            );
+        }
+
+        // STEP 2 : CREATE STUDENT
+        const studentRes = await fetch(
+            GCC_BACKEND_URL + "/api/users/create_student/",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    full_name: bottomName,
+                    email: bottomEmail,
+                    city: bottomCity,
+                    state: bottomState,
+                    country: "India",
+                    phone1: bottomPhone
+                })
+            }
+        );
+
+        const studentData = await studentRes.json();
+
+        if (!studentData.success) {
+            throw new Error(
+                studentData.message || "Failed to create student"
+            );
+        }
+
+        // SUCCESS REDIRECT
+        window.location.href = "thank-you.html";
+
+    } catch (error) {
+        console.error(error);
+        showStatusModal(
+            false,
+            error.message || "Something went wrong. Please try again."
+        );
+    }
+}
+
+function updateBottomCityDropdown(selectedState) {
+    const citySelect = document.getElementById("bottom_city");
+    if (!citySelect) return;
+
+    citySelect.innerHTML = '<option value="">City *</option>';
+
+    if (selectedState && stateCityData && stateCityData[selectedState]) {
+        const cities = stateCityData[selectedState].sort();
+        cities.forEach(city => {
+            const option = document.createElement("option");
+            option.value = city;
+            option.textContent = city;
+            citySelect.appendChild(option);
+        });
+    }
+}
+
 let stateCityData = null;
 
 function loadStateCityData() {
@@ -266,6 +765,30 @@ function loadStateCityData() {
                     updateHeroCityDropdown(heroStateSelect.value);
                 }
             }
+
+            // Populate Bottom State select
+            const bottomStateSelect = document.getElementById("bottom_state");
+            if (bottomStateSelect) {
+                while (bottomStateSelect.options.length > 1) {
+                    bottomStateSelect.remove(1);
+                }
+
+                const states = Object.keys(data).sort();
+                states.forEach(state => {
+                    const option = document.createElement("option");
+                    option.value = state;
+                    option.textContent = state;
+                    bottomStateSelect.appendChild(option);
+                });
+
+                bottomStateSelect.addEventListener("change", function () {
+                    updateBottomCityDropdown(this.value);
+                });
+
+                if (bottomStateSelect.value) {
+                    updateBottomCityDropdown(bottomStateSelect.value);
+                }
+            }
         })
         .catch(err => console.error("Could not load state-city.json", err));
 }
@@ -308,6 +831,75 @@ function updateHeroCityDropdown(selectedState) {
 document.addEventListener("DOMContentLoaded", function () {
     try { loadStateCityData(); } catch (e) { console.error(e); }
     try { loadUniversityData(); } catch (e) { console.error(e); }
+
+    // Reset OTP status if hero phone number is changed
+    const heroPhoneEl = document.getElementById("hero_phone");
+    if (heroPhoneEl) {
+        heroPhoneEl.addEventListener("input", function() {
+            const otpSection = document.getElementById("hero_otp_section");
+            if (otpSection && otpSection.style.display !== "none") {
+                otpSection.style.display = "none";
+            }
+            isHeroOtpVerified = false;
+            const successMsg = document.getElementById("hero_otp_success_msg");
+            if (successMsg) successMsg.style.display = "none";
+            const otpInput = document.getElementById("hero_otp");
+            if (otpInput) {
+                otpInput.disabled = false;
+                otpInput.value = "";
+            }
+            const sendBtn = document.getElementById("btn_hero_send_otp");
+            if (sendBtn) {
+                sendBtn.style.display = "inline-block";
+                sendBtn.disabled = false;
+                sendBtn.innerText = "Send OTP";
+            }
+            const verifyBtn = document.getElementById("btn_hero_verify_otp");
+            if (verifyBtn) {
+                verifyBtn.disabled = false;
+                verifyBtn.innerText = "Verify OTP";
+            }
+            if (heroOtpTimerInterval) {
+                clearInterval(heroOtpTimerInterval);
+                heroOtpTimerInterval = null;
+            }
+        });
+    }
+
+    // Reset OTP status if bottom phone number is changed
+    const bottomPhoneEl = document.getElementById("bottom_phone");
+    if (bottomPhoneEl) {
+        bottomPhoneEl.addEventListener("input", function() {
+            const otpSection = document.getElementById("bottom_otp_section");
+            if (otpSection && otpSection.style.display !== "none") {
+                otpSection.style.display = "none";
+            }
+            isBottomOtpVerified = false;
+            const successMsg = document.getElementById("bottom_otp_success_msg");
+            if (successMsg) successMsg.style.display = "none";
+            const otpInput = document.getElementById("bottom_otp");
+            if (otpInput) {
+                otpInput.disabled = false;
+                otpInput.value = "";
+            }
+            const sendBtn = document.getElementById("btn_bottom_send_otp");
+            if (sendBtn) {
+                sendBtn.style.display = "inline-block";
+                sendBtn.disabled = false;
+                sendBtn.innerText = "Send OTP";
+            }
+            const verifyBtn = document.getElementById("btn_bottom_verify_otp");
+            if (verifyBtn) {
+                verifyBtn.disabled = false;
+                verifyBtn.innerText = "Verify OTP";
+            }
+            if (bottomOtpTimerInterval) {
+                clearInterval(bottomOtpTimerInterval);
+                bottomOtpTimerInterval = null;
+            }
+        });
+    }
+
     console.log("GCC School Payments & Prefill Initialized");
 });
 
