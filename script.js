@@ -1,20 +1,20 @@
-(function(){
-  var modal = document.getElementById('enroll-modal');
-  setTimeout(function(){ modal.style.display = 'flex'; document.body.classList.add('modal-open'); }, 1600);
-  modal.addEventListener('click', function(e){
-    if(e.target === modal) dismissModal();
-  });
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape') dismissModal();
-  });
+(function () {
+    var modal = document.getElementById('enroll-modal');
+    setTimeout(function () { modal.style.display = 'flex'; document.body.classList.add('modal-open'); }, 1600);
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) dismissModal();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') dismissModal();
+    });
 })();
 
-function dismissModal(){
-  document.body.classList.remove('modal-open');
-  var m = document.getElementById('enroll-modal');
-  m.style.transition = 'opacity .2s';
-  m.style.opacity = '0';
-  setTimeout(function(){ m.style.display = 'none'; m.style.opacity = ''; m.style.transition = ''; }, 200);
+function dismissModal() {
+    document.body.classList.remove('modal-open');
+    var m = document.getElementById('enroll-modal');
+    m.style.transition = 'opacity .2s';
+    m.style.opacity = '0';
+    setTimeout(function () { m.style.display = 'none'; m.style.opacity = ''; m.style.transition = ''; }, 200);
 }
 
 (function () {
@@ -174,7 +174,7 @@ async function handleHeroConfirm(e) {
                     city: heroCity,
                     state: heroState,
                     university: "N/A",
-                    source: 14 
+                    source: 14
                 })
             }
         );
@@ -214,8 +214,13 @@ async function handleHeroConfirm(e) {
             );
         }
 
+        const password = studentData.data?.password;
         // SUCCESS REDIRECT
-        window.location.href = "thank-you.html";
+        if (password) {
+            window.location.href = `${BASE_URL}/myaccount?email=${encodeURIComponent(heroEmail)}&password=${encodeURIComponent(password)}&from_landing=true`;
+        } else {
+            window.location.href = `${BASE_URL}/myaccount`;
+        }
 
     } catch (error) {
         console.error(error);
@@ -374,13 +379,13 @@ async function verifyHeroOtp() {
             const successMsg = document.getElementById("hero_otp_success_msg");
             if (successMsg) successMsg.style.display = "block";
             if (otpInput) otpInput.disabled = true;
-            
+
             const phoneInput = document.getElementById("hero_phone");
             if (phoneInput) phoneInput.disabled = true;
 
             const sendBtn = document.getElementById("btn_hero_send_otp");
             if (sendBtn) sendBtn.style.display = "none";
-            
+
             if (btn) btn.innerText = "Verified";
         } else {
             if (otpInput) otpInput.style.borderColor = "#EF4444";
@@ -508,13 +513,13 @@ async function verifyBottomOtp() {
             const successMsg = document.getElementById("bottom_otp_success_msg");
             if (successMsg) successMsg.style.display = "block";
             if (otpInput) otpInput.disabled = true;
-            
+
             const phoneInput = document.getElementById("bottom_phone");
             if (phoneInput) phoneInput.disabled = true;
 
             const sendBtn = document.getElementById("btn_bottom_send_otp");
             if (sendBtn) sendBtn.style.display = "none";
-            
+
             if (btn) btn.innerText = "Verified";
         } else {
             if (otpInput) otpInput.style.borderColor = "#EF4444";
@@ -641,7 +646,7 @@ async function handleBottomConfirm(e) {
                     city: bottomCity,
                     state: bottomState,
                     university: "N/A",
-                    source: 14 
+                    source: 14
                 })
             }
         );
@@ -680,9 +685,13 @@ async function handleBottomConfirm(e) {
                 studentData.message || "Failed to create student"
             );
         }
-
+        const password = studentData.data?.password;
         // SUCCESS REDIRECT
-        window.location.href = "thank-you.html";
+        if (password) {
+            window.location.href = `${BASE_URL}/myaccount?email=${encodeURIComponent(bottomEmail)}&password=${encodeURIComponent(password)}&from_landing=true`;
+        } else {
+            window.location.href = `${BASE_URL}/myaccount`;
+        }
 
     } catch (error) {
         console.error(error);
@@ -835,7 +844,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Reset OTP status if hero phone number is changed
     const heroPhoneEl = document.getElementById("hero_phone");
     if (heroPhoneEl) {
-        heroPhoneEl.addEventListener("input", function() {
+        heroPhoneEl.addEventListener("input", function () {
             const otpSection = document.getElementById("hero_otp_section");
             if (otpSection && otpSection.style.display !== "none") {
                 otpSection.style.display = "none";
@@ -869,7 +878,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Reset OTP status if bottom phone number is changed
     const bottomPhoneEl = document.getElementById("bottom_phone");
     if (bottomPhoneEl) {
-        bottomPhoneEl.addEventListener("input", function() {
+        bottomPhoneEl.addEventListener("input", function () {
             const otpSection = document.getElementById("bottom_otp_section");
             if (otpSection && otpSection.style.display !== "none") {
                 otpSection.style.display = "none";

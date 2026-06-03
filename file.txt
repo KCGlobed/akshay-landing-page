@@ -1,0 +1,57 @@
+ const autoLogin = async (email: string, password: string, pid: string = '') => {
+            console.log("[AUTOLOGIN] Starting automated login for:", email);
+            try {
+                processingMessage.value = 'Signing you in...';
+                const config = useRuntimeConfig();
+                const response: any = await $fetch(
+                    `${config.public.apiBase}/api/users/website_login/`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: {
+                            email: email,
+                            password: password,
+                            role: 'student',
+                        },
+                    }
+                );
+
+                console.log("[AUTOLOGIN] Login API Response:", response);
+
+                if (response.data?.token) {
+                    console.log("[AUTOLOGIN] Login successful. Extracting tokens and user info.");
+                    const { access, refresh } = response.data.token;
+                    const user_role = response.data.user_role ?? null;
+                    const user_id = response.data.user_id ?? null;
+
+                    auth.login({ access, refresh, user_role, user_id });
+
+                    // Show final success state in the modal
+                    if (pid === 'REFERRAL_CODE') {
+                        // Referral code: do nothing, let submitForm show the popup
+                    } else if (pid !== 'DIRECT_CREATE_CCS') {
+                        paymentStatus.value = 'success';
+                        paymentId.value = pid;
+                        processingMessage.value = 'Successfully registered! Redirecting to profile...';
+
+                        setTimeout(() => {
+                            window.location.href = '/myaccount';
+                        }, 3000);
+                    } else {
+                        await closeStatusModal();
+                        window.location.href = '/myaccount';
+                    }
+                } else {
+                    console.error("[AUTOLOGIN] Login failed - No token received");
+                }
+            } catch (err: any) {
+                await closeStatusModal();
+                console.error('[AUTOLOGIN] Critical Error:', err);
+                showAlert('Login Failed', 'Account created but automatic login failed. Please login manually.', 'error');
+            }
+        };
+
+
+
+
+
