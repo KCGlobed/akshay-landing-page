@@ -174,7 +174,7 @@ async function handleHeroConfirm(e) {
                     phone: heroPhone,
                     city: heroCity,
                     state: heroState,
-                    university: "N/A",
+                    university: "Others",
                     source: 14
                 })
             }
@@ -646,7 +646,7 @@ async function handleBottomConfirm(e) {
                     phone: bottomPhone,
                     city: bottomCity,
                     state: bottomState,
-                    university: "N/A",
+                    university: "Others",
                     source: 14
                 })
             }
