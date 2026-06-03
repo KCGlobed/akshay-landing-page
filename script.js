@@ -18,7 +18,7 @@ function dismissModal() {
 }
 
 (function () {
-    var TOTAL = 27 * 60;
+    var TOTAL = 10 * 60;
     var remaining = TOTAL;
     var modalEl = document.getElementById('modal-timer');
     var barEl = document.getElementById('bar-timer');
