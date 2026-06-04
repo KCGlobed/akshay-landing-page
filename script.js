@@ -230,6 +230,7 @@ async function handleHeroConfirm(e) {
                     state: heroState,
                     university: "Others",
                     source: 14,
+                    fee_waiver_category: "Free of cost (FOC)",
                     ...getTrackingParams()
                 })
             }
@@ -703,6 +704,7 @@ async function handleBottomConfirm(e) {
                     state: bottomState,
                     university: "Others",
                     source: 14,
+                    fee_waiver_category: "Free of cost (FOC)",
                     ...getTrackingParams()
                 })
             }
