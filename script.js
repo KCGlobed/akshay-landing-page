@@ -153,6 +153,15 @@ async function handleHeroConfirm(e) {
             if (!firstErrEl) firstErrEl = el;
         }
         hasError = true;
+    } else if (!/^[a-zA-Z\s]+$/.test(heroName)) {
+        const el = document.getElementById("hero_name");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        alert("Full Name should only contain letters and spaces.");
+        hasError = true;
     }
     if (!heroPhone || !/^[6-9]\d{9}$/.test(heroPhone)) {
         const el = document.getElementById("hero_phone");
@@ -626,6 +635,15 @@ async function handleBottomConfirm(e) {
             el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
             if (!firstErrEl) firstErrEl = el;
         }
+        hasError = true;
+    } else if (!/^[a-zA-Z\s]+$/.test(bottomName)) {
+        const el = document.getElementById("bottom_name");
+        if (el) {
+            el.style.borderColor = "#EF4444";
+            el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+            if (!firstErrEl) firstErrEl = el;
+        }
+        alert("Full Name should only contain letters and spaces.");
         hasError = true;
     }
     if (!bottomPhone || !/^[6-9]\d{9}$/.test(bottomPhone)) {
