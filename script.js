@@ -87,6 +87,41 @@ function getBackendErrorMessage(data, defaultMsg) {
     return defaultMsg;
 }
 
+function getTrackingParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const trackingKeys = [
+        'utm_medium',
+        'utm_source',
+        'utm_campaign',
+        'utm_content',
+        'fbc_id',
+        'utm_adname',
+        'campaign_id',
+        'adset_id',
+        'fbclid',
+        'ad_source',
+        'ad_id',
+        'utm_adgroupid',
+        'utm_creativeid',
+        'utm_matchtype',
+        'utm_device',
+        'utm_network',
+        'utm_keyword',
+        'gad_source',
+        'gad_campaignid',
+        'gbraid',
+        'gclid'
+    ];
+    const params = {};
+    trackingKeys.forEach(key => {
+        const val = urlParams.get(key);
+        if (val) {
+            params[key] = val;
+        }
+    });
+    return params;
+}
+
 // Hero Form Card Prefill & Pre-assessment Redirect
 async function handleHeroConfirm(e) {
     if (e) e.preventDefault();
@@ -194,7 +229,8 @@ async function handleHeroConfirm(e) {
                     city: heroCity,
                     state: heroState,
                     university: "Others",
-                    source: 14
+                    source: 14,
+                    ...getTrackingParams()
                 })
             }
         );
@@ -666,7 +702,8 @@ async function handleBottomConfirm(e) {
                     city: bottomCity,
                     state: bottomState,
                     university: "Others",
-                    source: 14
+                    source: 14,
+                    ...getTrackingParams()
                 })
             }
         );
