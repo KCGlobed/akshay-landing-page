@@ -51,20 +51,20 @@ function dismissModal() {
 })();
 
 
-// var BASE_URL = "https://gccschool.com";
-var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
+var BASE_URL = "https://gccschool.com";
+// var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
 
-// var mode = "production";
-var mode = "sandbox";
+var mode = "production";
+// var mode = "sandbox";
 
-// var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app";
-var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
+var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app";
+// var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
 var FORM_TYPE = 1;
 
 var finalFormSubmitFired = false;
 
-// var OTP_BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
-var OTP_BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
+var OTP_BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
+// var OTP_BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
 var isOtpVerified = false;
 var otpTimerInterval = null;
 
