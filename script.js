@@ -51,14 +51,14 @@ function dismissModal() {
 })();
 
 
-var BASE_URL = "https://gccschool.com";
-// var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
+// var BASE_URL = "https://gccschool.com";
+var BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
 
-var mode = "production";
-// var mode = "sandbox";
+// var mode = "production";
+var mode = "sandbox";
 
-var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app";
-// var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
+// var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app";
+var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
 var FORM_TYPE = 1;
 
 var finalFormSubmitFired = false;
@@ -85,6 +85,41 @@ function getBackendErrorMessage(data, defaultMsg) {
         }
     }
     return defaultMsg;
+}
+
+function getTrackingParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const trackingKeys = [
+        'utm_medium',
+        'utm_source',
+        'utm_campaign',
+        'utm_content',
+        'fbc_id',
+        'utm_adname',
+        'campaign_id',
+        'adset_id',
+        'fbclid',
+        'ad_source',
+        'ad_id',
+        'utm_adgroupid',
+        'utm_creativeid',
+        'utm_matchtype',
+        'utm_device',
+        'utm_network',
+        'utm_keyword',
+        'gad_source',
+        'gad_campaignid',
+        'gbraid',
+        'gclid'
+    ];
+    const params = {};
+    trackingKeys.forEach(key => {
+        const val = urlParams.get(key);
+        if (val) {
+            params[key] = val;
+        }
+    });
+    return params;
 }
 
 // Hero Form Card Prefill & Pre-assessment Redirect
@@ -194,7 +229,8 @@ async function handleHeroConfirm(e) {
                     city: heroCity,
                     state: heroState,
                     university: "Others",
-                    source: 14
+                    source: 14,
+                    ...getTrackingParams()
                 })
             }
         );
@@ -666,7 +702,8 @@ async function handleBottomConfirm(e) {
                     city: bottomCity,
                     state: bottomState,
                     university: "Others",
-                    source: 14
+                    source: 14,
+                    ...getTrackingParams()
                 })
             }
         );
