@@ -68,6 +68,25 @@ var OTP_BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
 var isOtpVerified = false;
 var otpTimerInterval = null;
 
+function getBackendErrorMessage(data, defaultMsg) {
+    if (!data) return defaultMsg;
+    if (data.message) return data.message;
+    if (data.non_field_errors) {
+        if (Array.isArray(data.non_field_errors) && data.non_field_errors.length > 0) {
+            return data.non_field_errors[0];
+        }
+        if (typeof data.non_field_errors === "string") {
+            return data.non_field_errors;
+        }
+    }
+    for (const key in data) {
+        if (Array.isArray(data[key]) && data[key].length > 0) {
+            return data[key][0];
+        }
+    }
+    return defaultMsg;
+}
+
 // Hero Form Card Prefill & Pre-assessment Redirect
 async function handleHeroConfirm(e) {
     if (e) e.preventDefault();
@@ -184,7 +203,7 @@ async function handleHeroConfirm(e) {
 
         if (!dossierData.success) {
             throw new Error(
-                dossierData.message || "Failed to create dossier"
+                getBackendErrorMessage(dossierData, "Failed to create dossier")
             );
         }
 
@@ -211,7 +230,7 @@ async function handleHeroConfirm(e) {
 
         if (!studentData.success) {
             throw new Error(
-                studentData.message || "Failed to create student"
+                getBackendErrorMessage(studentData, "Failed to create student")
             );
         }
 
@@ -656,7 +675,7 @@ async function handleBottomConfirm(e) {
 
         if (!dossierData.success) {
             throw new Error(
-                dossierData.message || "Failed to create dossier"
+                getBackendErrorMessage(dossierData, "Failed to create dossier")
             );
         }
 
@@ -683,7 +702,7 @@ async function handleBottomConfirm(e) {
 
         if (!studentData.success) {
             throw new Error(
-                studentData.message || "Failed to create student"
+                getBackendErrorMessage(studentData, "Failed to create student")
             );
         }
         const password = studentData.data?.password;
@@ -940,7 +959,7 @@ function showLoadingModal(message) {
     desc.innerHTML = message || 'Creating your account...';
 
     if (footer) {
-        footer.innerHTML = 'Do not refresh or close this window.';
+        // footer.innerHTML = 'Do not refresh or close this window.';
     }
 
     retryBtn.style.display = "none";
@@ -986,7 +1005,7 @@ function showStatusModal(isSuccess, message, orderId) {
         badge.textContent = "✦ FAILED";
         title.innerHTML = 'Registration <span>Failed</span>';
         desc.innerHTML = message || "Your registration could not be completed.";
-        if (footer) footer.innerHTML = 'System Error';
+        // if (footer) footer.innerHTML = 'System Error';
         retryBtn.style.display = "block";
     }
 
