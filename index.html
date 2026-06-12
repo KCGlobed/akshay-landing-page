@@ -172,13 +172,16 @@
                 <div class="otp-input-group">
                   <input type="tel" id="hero_phone" class="form-control group-input" placeholder="Mobile Number *"
                     aria-label="Mobile Number" required>
-                  <button type="button" id="btn_hero_send_otp" onclick="sendHeroOtp()" class="btn btn-purple group-btn">Send
+                  <button type="button" id="btn_hero_send_otp" onclick="sendHeroOtp()"
+                    class="btn btn-purple group-btn">Send
                     OTP</button>
                 </div>
                 <div id="hero_otp_section" style="display: none; margin-top: 2px;">
                   <div class="otp-input-group">
-                    <input class="form-control group-input" id="hero_otp" type="text" placeholder="6-digit OTP *" maxlength="6">
-                    <button type="button" id="btn_hero_verify_otp" onclick="verifyHeroOtp()" class="btn btn-purple group-btn">Verify
+                    <input class="form-control group-input" id="hero_otp" type="text" placeholder="6-digit OTP *"
+                      maxlength="6">
+                    <button type="button" id="btn_hero_verify_otp" onclick="verifyHeroOtp()"
+                      class="btn btn-purple group-btn">Verify
                       OTP</button>
                   </div>
                   <div id="hero_otp_success_msg"
@@ -919,25 +922,28 @@
           <input type="text" id="bottom_name" class="form-control form-control--dark" placeholder="Full Name *"
             aria-label="Full Name" required>
           <div class="otp-input-group">
-            <input type="tel" id="bottom_phone" class="form-control form-control--dark group-input" placeholder="Mobile Number *"
-              aria-label="Mobile" required>
-            <button type="button" id="btn_bottom_send_otp" onclick="sendBottomOtp()" class="btn btn-purple group-btn">Send
+            <input type="tel" id="bottom_phone" class="form-control form-control--dark group-input"
+              placeholder="Mobile Number *" aria-label="Mobile" required>
+            <button type="button" id="btn_bottom_send_otp" onclick="sendBottomOtp()"
+              class="btn btn-purple group-btn">Send
               OTP</button>
           </div>
           <input type="email" id="bottom_email" class="form-control form-control--dark" placeholder="Email Address *"
             aria-label="Email" required>
-          
+
         </div>
 
         <div id="bottom_otp_section" style="display: none; max-width: 900px; margin: 8px auto 0;">
           <div class="otp-input-group" style="max-width: 400px; margin: 0 auto;">
-            <input class="form-control form-control--dark group-input" id="bottom_otp" type="text" placeholder="6-digit OTP *"
-              maxlength="6">
-            <button type="button" id="btn_bottom_verify_otp" onclick="verifyBottomOtp()" class="btn btn-purple group-btn">Verify
+            <input class="form-control form-control--dark group-input" id="bottom_otp" type="text"
+              placeholder="6-digit OTP *" maxlength="6">
+            <button type="button" id="btn_bottom_verify_otp" onclick="verifyBottomOtp()"
+              class="btn btn-purple group-btn">Verify
               OTP</button>
           </div>
           <div id="bottom_otp_success_msg"
-            style="display: none; color: #22C55E; font-size: 0.85rem; margin-top: 5px; font-weight: 600; text-align: center;">OTP Verified
+            style="display: none; color: #22C55E; font-size: 0.85rem; margin-top: 5px; font-weight: 600; text-align: center;">
+            OTP Verified
             Successfully!</div>
         </div>
 
@@ -980,7 +986,7 @@
     <script>
       // ── Countdown Timer ──
       (function () {
-        const end = new Date('2026-06-10T23:59:59+05:30').getTime();
+        const end = new Date('2026-06-15T23:59:59+05:30').getTime();
         const pad = n => String(Math.floor(n)).padStart(2, '0');
         const ids = { d: ['t-d', 'h-d'], h: ['t-h', 'h-h'], m: ['t-m', 'h-m'], s: ['t-s'] };
         function tick() {
