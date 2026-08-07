@@ -1,0 +1,18 @@
+{
+    "version": 1,
+    "project": {
+        "name": "akshay-page",
+        "runtime": "static",
+        "repository": "KCGlobed/akshay-landing-page",
+        "branch": "main"
+    },
+    "deployment": {
+        "keepReleases": 5
+    },
+    "runtimeConfig": {},
+    "web": {
+        "domain": "nfetrm.gccschool.com",
+        "ssl": true,
+        "sslEmail": "kcglobed@gmail.com"
+    }
+}
