@@ -63,11 +63,6 @@ var FORM_TYPE = 1;
 
 var finalFormSubmitFired = false;
 
-// var OTP_BASE_URL = "https://kcglobed-gcc-website-932479078084.asia-south1.run.app";
-var OTP_BASE_URL = "https://gcc-website-prod-932479078084.europe-west1.run.app";
-var isOtpVerified = false;
-var otpTimerInterval = null;
-
 function getBackendErrorMessage(data, defaultMsg) {
     if (!data) return defaultMsg;
     if (data.message) return data.message;
@@ -208,17 +203,6 @@ async function handleHeroConfirm(e) {
         return;
     }
 
-    if (!isHeroOtpVerified) {
-        const phoneInput = document.getElementById("hero_phone");
-        if (phoneInput) {
-            phoneInput.style.borderColor = "#EF4444";
-            phoneInput.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
-            phoneInput.focus();
-        }
-        alert("Please verify your mobile number with OTP first.");
-        return;
-    }
-
     showLoadingModal("Please wait, creating your account...");
 
     try {
@@ -338,273 +322,6 @@ document.addEventListener("click", function (e) {
     }
 });
 
-// Hero OTP send and verify pipeline
-var isHeroOtpVerified = false;
-var heroOtpTimerInterval = null;
-
-async function sendHeroOtp() {
-    const phoneInput = document.getElementById("hero_phone");
-    const phone = phoneInput ? phoneInput.value.trim() : "";
-    const btn = document.getElementById("btn_hero_send_otp");
-
-    if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
-        if (phoneInput) {
-            phoneInput.style.borderColor = "#EF4444";
-            phoneInput.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
-        }
-        alert("Please enter a valid 10-digit mobile number to send OTP.");
-        return;
-    }
-
-    if (phoneInput) {
-        phoneInput.style.borderColor = "";
-        phoneInput.style.boxShadow = "";
-    }
-    if (btn) {
-        btn.disabled = true;
-        btn.innerText = "Sending...";
-    }
-
-    try {
-        const res = await fetch(OTP_BASE_URL + '/api/otp/send', {
-            method: 'POST',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mobile: phone })
-        });
-        const data = await res.json();
-
-        if (data.success || res.ok) {
-            const otpSection = document.getElementById("hero_otp_section");
-            if (otpSection) otpSection.style.display = "block";
-
-            let otpCountdown = 60;
-            if (btn) btn.innerText = `Resend in ${otpCountdown}s`;
-
-            if (heroOtpTimerInterval) clearInterval(heroOtpTimerInterval);
-            heroOtpTimerInterval = setInterval(() => {
-                otpCountdown--;
-                if (otpCountdown > 0) {
-                    if (btn) btn.innerText = `Resend in ${otpCountdown}s`;
-                } else {
-                    clearInterval(heroOtpTimerInterval);
-                    if (btn) {
-                        btn.innerText = "Resend OTP";
-                        btn.disabled = false;
-                    }
-                }
-            }, 1000);
-
-        } else {
-            if (phoneInput) phoneInput.style.borderColor = "#EF4444";
-            alert(data.message || data.statusMessage || "Failed to send OTP");
-            if (btn) {
-                btn.disabled = false;
-                btn.innerText = "Send OTP";
-            }
-        }
-    } catch (err) {
-        console.error(err);
-        if (phoneInput) phoneInput.style.borderColor = "#EF4444";
-        alert("Failed to send OTP. Please try again.");
-        if (btn) {
-            btn.disabled = false;
-            btn.innerText = "Send OTP";
-        }
-    }
-}
-
-async function verifyHeroOtp() {
-    const phone = document.getElementById("hero_phone")?.value.trim() || "";
-    const otpInput = document.getElementById("hero_otp");
-    const otp = otpInput ? otpInput.value.trim() : "";
-    const btn = document.getElementById("btn_hero_verify_otp");
-
-    if (!otp || otp.length !== 6) {
-        if (otpInput) otpInput.style.borderColor = "#EF4444";
-        alert("Please enter a valid 6-digit OTP.");
-        return;
-    }
-
-    if (otpInput) otpInput.style.borderColor = "";
-    if (btn) {
-        btn.disabled = true;
-        btn.innerText = "Verifying...";
-    }
-
-    try {
-        const res = await fetch(OTP_BASE_URL + '/api/otp/verify', {
-            method: 'POST',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mobile: phone, otp: otp })
-        });
-        const data = await res.json();
-
-        if (data.success || res.ok) {
-            isHeroOtpVerified = true;
-            if (heroOtpTimerInterval) clearInterval(heroOtpTimerInterval);
-            const successMsg = document.getElementById("hero_otp_success_msg");
-            if (successMsg) successMsg.style.display = "block";
-            if (otpInput) otpInput.disabled = true;
-
-            const phoneInput = document.getElementById("hero_phone");
-            if (phoneInput) phoneInput.disabled = true;
-
-            const sendBtn = document.getElementById("btn_hero_send_otp");
-            if (sendBtn) sendBtn.style.display = "none";
-
-            if (btn) btn.innerText = "Verified";
-        } else {
-            if (otpInput) otpInput.style.borderColor = "#EF4444";
-            alert(data.message || data.statusMessage || "Invalid or expired OTP");
-            if (btn) {
-                btn.disabled = false;
-                btn.innerText = "Verify OTP";
-            }
-        }
-    } catch (err) {
-        console.error(err);
-        if (otpInput) otpInput.style.borderColor = "#EF4444";
-        alert("Failed to verify OTP. Please try again.");
-        if (btn) {
-            btn.disabled = false;
-            btn.innerText = "Verify OTP";
-        }
-    }
-}
-
-// Bottom OTP send and verify pipeline
-var isBottomOtpVerified = false;
-var bottomOtpTimerInterval = null;
-
-async function sendBottomOtp() {
-    const phoneInput = document.getElementById("bottom_phone");
-    const phone = phoneInput ? phoneInput.value.trim() : "";
-    const btn = document.getElementById("btn_bottom_send_otp");
-
-    if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
-        if (phoneInput) {
-            phoneInput.style.borderColor = "#EF4444";
-            phoneInput.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
-        }
-        alert("Please enter a valid 10-digit mobile number to send OTP.");
-        return;
-    }
-
-    if (phoneInput) {
-        phoneInput.style.borderColor = "";
-        phoneInput.style.boxShadow = "";
-    }
-    if (btn) {
-        btn.disabled = true;
-        btn.innerText = "Sending...";
-    }
-
-    try {
-        const res = await fetch(OTP_BASE_URL + '/api/otp/send', {
-            method: 'POST',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mobile: phone })
-        });
-        const data = await res.json();
-
-        if (data.success || res.ok) {
-            const otpSection = document.getElementById("bottom_otp_section");
-            if (otpSection) otpSection.style.display = "block";
-
-            let otpCountdown = 60;
-            if (btn) btn.innerText = `Resend in ${otpCountdown}s`;
-
-            if (bottomOtpTimerInterval) clearInterval(bottomOtpTimerInterval);
-            bottomOtpTimerInterval = setInterval(() => {
-                otpCountdown--;
-                if (otpCountdown > 0) {
-                    if (btn) btn.innerText = `Resend in ${otpCountdown}s`;
-                } else {
-                    clearInterval(bottomOtpTimerInterval);
-                    if (btn) {
-                        btn.innerText = "Resend OTP";
-                        btn.disabled = false;
-                    }
-                }
-            }, 1000);
-
-        } else {
-            if (phoneInput) phoneInput.style.borderColor = "#EF4444";
-            alert(data.message || data.statusMessage || "Failed to send OTP");
-            if (btn) {
-                btn.disabled = false;
-                btn.innerText = "Send OTP";
-            }
-        }
-    } catch (err) {
-        console.error(err);
-        if (phoneInput) phoneInput.style.borderColor = "#EF4444";
-        alert("Failed to send OTP. Please try again.");
-        if (btn) {
-            btn.disabled = false;
-            btn.innerText = "Send OTP";
-        }
-    }
-}
-
-async function verifyBottomOtp() {
-    const phone = document.getElementById("bottom_phone")?.value.trim() || "";
-    const otpInput = document.getElementById("bottom_otp");
-    const otp = otpInput ? otpInput.value.trim() : "";
-    const btn = document.getElementById("btn_bottom_verify_otp");
-
-    if (!otp || otp.length !== 6) {
-        if (otpInput) otpInput.style.borderColor = "#EF4444";
-        alert("Please enter a valid 6-digit OTP.");
-        return;
-    }
-
-    if (otpInput) otpInput.style.borderColor = "";
-    if (btn) {
-        btn.disabled = true;
-        btn.innerText = "Verifying...";
-    }
-
-    try {
-        const res = await fetch(OTP_BASE_URL + '/api/otp/verify', {
-            method: 'POST',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mobile: phone, otp: otp })
-        });
-        const data = await res.json();
-
-        if (data.success || res.ok) {
-            isBottomOtpVerified = true;
-            if (bottomOtpTimerInterval) clearInterval(bottomOtpTimerInterval);
-            const successMsg = document.getElementById("bottom_otp_success_msg");
-            if (successMsg) successMsg.style.display = "block";
-            if (otpInput) otpInput.disabled = true;
-
-            const phoneInput = document.getElementById("bottom_phone");
-            if (phoneInput) phoneInput.disabled = true;
-
-            const sendBtn = document.getElementById("btn_bottom_send_otp");
-            if (sendBtn) sendBtn.style.display = "none";
-
-            if (btn) btn.innerText = "Verified";
-        } else {
-            if (otpInput) otpInput.style.borderColor = "#EF4444";
-            alert(data.message || data.statusMessage || "Invalid or expired OTP");
-            if (btn) {
-                btn.disabled = false;
-                btn.innerText = "Verify OTP";
-            }
-        }
-    } catch (err) {
-        console.error(err);
-        if (otpInput) otpInput.style.borderColor = "#EF4444";
-        alert("Failed to verify OTP. Please try again.");
-        if (btn) {
-            btn.disabled = false;
-            btn.innerText = "Verify OTP";
-        }
-    }
-}
 
 async function handleBottomConfirm(e) {
     if (e) e.preventDefault();
@@ -688,17 +405,6 @@ async function handleBottomConfirm(e) {
             firstErrEl.focus();
             firstErrEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        return;
-    }
-
-    if (!isBottomOtpVerified) {
-        const phoneInput = document.getElementById("bottom_phone");
-        if (phoneInput) {
-            phoneInput.style.borderColor = "#EF4444";
-            phoneInput.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
-            phoneInput.focus();
-        }
-        alert("Please verify your mobile number with OTP first.");
         return;
     }
 
@@ -918,73 +624,6 @@ document.addEventListener("DOMContentLoaded", function () {
     try { loadStateCityData(); } catch (e) { console.error(e); }
     try { loadUniversityData(); } catch (e) { console.error(e); }
 
-    // Reset OTP status if hero phone number is changed
-    const heroPhoneEl = document.getElementById("hero_phone");
-    if (heroPhoneEl) {
-        heroPhoneEl.addEventListener("input", function () {
-            const otpSection = document.getElementById("hero_otp_section");
-            if (otpSection && otpSection.style.display !== "none") {
-                otpSection.style.display = "none";
-            }
-            isHeroOtpVerified = false;
-            const successMsg = document.getElementById("hero_otp_success_msg");
-            if (successMsg) successMsg.style.display = "none";
-            const otpInput = document.getElementById("hero_otp");
-            if (otpInput) {
-                otpInput.disabled = false;
-                otpInput.value = "";
-            }
-            const sendBtn = document.getElementById("btn_hero_send_otp");
-            if (sendBtn) {
-                sendBtn.style.display = "inline-block";
-                sendBtn.disabled = false;
-                sendBtn.innerText = "Send OTP";
-            }
-            const verifyBtn = document.getElementById("btn_hero_verify_otp");
-            if (verifyBtn) {
-                verifyBtn.disabled = false;
-                verifyBtn.innerText = "Verify OTP";
-            }
-            if (heroOtpTimerInterval) {
-                clearInterval(heroOtpTimerInterval);
-                heroOtpTimerInterval = null;
-            }
-        });
-    }
-
-    // Reset OTP status if bottom phone number is changed
-    const bottomPhoneEl = document.getElementById("bottom_phone");
-    if (bottomPhoneEl) {
-        bottomPhoneEl.addEventListener("input", function () {
-            const otpSection = document.getElementById("bottom_otp_section");
-            if (otpSection && otpSection.style.display !== "none") {
-                otpSection.style.display = "none";
-            }
-            isBottomOtpVerified = false;
-            const successMsg = document.getElementById("bottom_otp_success_msg");
-            if (successMsg) successMsg.style.display = "none";
-            const otpInput = document.getElementById("bottom_otp");
-            if (otpInput) {
-                otpInput.disabled = false;
-                otpInput.value = "";
-            }
-            const sendBtn = document.getElementById("btn_bottom_send_otp");
-            if (sendBtn) {
-                sendBtn.style.display = "inline-block";
-                sendBtn.disabled = false;
-                sendBtn.innerText = "Send OTP";
-            }
-            const verifyBtn = document.getElementById("btn_bottom_verify_otp");
-            if (verifyBtn) {
-                verifyBtn.disabled = false;
-                verifyBtn.innerText = "Verify OTP";
-            }
-            if (bottomOtpTimerInterval) {
-                clearInterval(bottomOtpTimerInterval);
-                bottomOtpTimerInterval = null;
-            }
-        });
-    }
 
     console.log("GCC School Payments & Prefill Initialized");
 });
@@ -1100,7 +739,7 @@ function resetGccForm() {
         citySelect.innerHTML = '<option value="">Select city</option>';
     }
 
-    const fieldsForErrors = ["gcc_name", "gcc_email", "gcc_phone", "gcc_state", "gcc_city", "gcc_degree", "gcc_commerce_graduate", "gcc_otp"];
+    const fieldsForErrors = ["gcc_name", "gcc_email", "gcc_phone", "gcc_state", "gcc_city", "gcc_degree", "gcc_commerce_graduate"];
     fieldsForErrors.forEach(f => {
         const errEl = document.getElementById("err_" + f);
         if (errEl) errEl.style.display = "none";
@@ -1112,10 +751,6 @@ function resetGccForm() {
     if (mainErrEl) mainErrEl.style.display = "none";
 
     finalFormSubmitFired = false;
-    isOtpVerified = false;
-    if (otpTimerInterval) clearInterval(otpTimerInterval);
-    const otpSection = document.getElementById("otp_section");
-    if (otpSection) otpSection.style.display = "none";
 }
 
 function loadUniversityData() {
