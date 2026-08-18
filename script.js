@@ -57,6 +57,7 @@ var BASE_URL = "https://gccschool.com";
 var mode = "production";
 // var mode = "sandbox";
 
+
 var GCC_BACKEND_URL = "https://gccwebsite-admin-prod-backend-738131651355.asia-south1.run.app";
 // var GCC_BACKEND_URL = "https://gccwebsite-admin-backend-738131651355.asia-south1.run.app"
 var FORM_TYPE = 1;
